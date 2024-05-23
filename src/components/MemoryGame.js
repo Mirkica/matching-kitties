@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Card from './Card';
+import Modal from './Modal'; // Import the Modal component
 import './MemoryGame.css';
 
 const MemoryGame = () => {
@@ -7,6 +8,7 @@ const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
 
   useEffect(() => {
     // Duplicate the card images and shuffle them
@@ -15,6 +17,12 @@ const MemoryGame = () => {
       .map((image, index) => ({ id: index, image, isFlipped: false }));
     setCards(shuffledCards);
   }, []);
+
+  useEffect(() => {
+    if (matchedCards.length === cardImages.length * 2) {
+      setIsGameCompleted(true);
+    }
+  }, [matchedCards]);
 
   const handleCardClick = (id) => {
     const flippedCard = cards.find(card => card.id === id);
@@ -49,19 +57,30 @@ const MemoryGame = () => {
     }
   };
 
+  const handleRestart = () => {
+    setIsGameCompleted(false);
+    setMatchedCards([]);
+    setFlippedCards([]);
+    const shuffledCards = [...cardImages, ...cardImages]
+      .sort(() => Math.random() - 0.5)
+      .map((image, index) => ({ id: index, image, isFlipped: false }));
+    setCards(shuffledCards);
+  };
+
   return (
     <div className="memory-game">
       {cards.map((card) => (
         <Card
-        key={card.id}
-        id={card.id}
-        image={card.image}
-        onClick={handleCardClick}
-        isFlipped={card.isFlipped || matchedCards.includes(card.id)}
-      />
-    ))}
-  </div>
-);
+          key={card.id}
+          id={card.id}
+          image={card.image}
+          onClick={handleCardClick}
+          isFlipped={card.isFlipped || matchedCards.includes(card.id)}
+        />
+      ))}
+      {isGameCompleted && <Modal onRestart={handleRestart} />}
+    </div>
+  );
 };
 
 export default MemoryGame;
