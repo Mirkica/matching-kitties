@@ -1,12 +1,15 @@
 import React from 'react';
-import GameBoard from './components/GameBoard';
 import './App.css';
+import MemoryGame from './components/MemoryGame';
 
 function App() {
   return (
     <div className="App">
-      <h1>Matching Kitties</h1>
-      <GameBoard />
+      <header className="App-header">
+        <h1>Matching Kitties</h1>
+        <p>Match all 😸 to win the game!</p>
+      </header>
+      <MemoryGame />
     </div>
   );
 }
