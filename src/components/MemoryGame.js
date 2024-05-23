@@ -4,7 +4,7 @@ import Modal from './Modal'; // Import the Modal component
 import './MemoryGame.css';
 
 const MemoryGame = () => {
-  const cardImages = ['cat1', 'cat2', 'cat3'];
+  const cardImages = ['cat1', 'cat2', 'cat3', 'cat4', 'cat5', 'cat6'];
   const [cards, setCards] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
@@ -22,7 +22,7 @@ const MemoryGame = () => {
     if (matchedCards.length === cardImages.length * 2) {
       setIsGameCompleted(true);
     }
-  }, [matchedCards]);
+  }, [cardImages.length, matchedCards]);
 
   const handleCardClick = (id) => {
     const flippedCard = cards.find(card => card.id === id);
