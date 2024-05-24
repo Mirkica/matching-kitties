@@ -6,7 +6,7 @@ const Modal = ({ onRestart }) => {
     <div className="modal">
       <div className="modal-content">
         <h2>Congratulations!</h2>
-        <p>You've completed the game!</p>
+        <p>You've matched all the cards!</p>
         <button onClick={onRestart}>Play Again</button>
       </div>
     </div>
