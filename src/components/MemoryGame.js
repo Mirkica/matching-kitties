@@ -1,84 +1,71 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Card from './Card';
-import Modal from './Modal'; // Import the Modal component
+import Modal from './Modal';
 import './MemoryGame.css';
 
 const MemoryGame = () => {
-  const cardImages = ['cat1', 'cat2', 'cat3', 'cat4', 'cat5', 'cat6'];
+  const cardImages = useMemo(() => ['cat1', 'cat2', 'cat3', 'cat4', 'cat5', 'cat6'], []);
   const [cards, setCards] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
-  const [isGameCompleted, setIsGameCompleted] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    // Duplicate the card images and shuffle them
-    const shuffledCards = [...cardImages, ...cardImages]
-      .sort(() => Math.random() - 0.5)
-      .map((image, index) => ({ id: index, image, isFlipped: false }));
+    const shuffledCards = [...cardImages, ...cardImages].sort(() => Math.random() - 0.5);
     setCards(shuffledCards);
-  }, []);
+  }, [cardImages]);
 
   useEffect(() => {
+    console.log('matchedCards:', matchedCards);
+    console.log('cardImages length:', cardImages.length);
+    console.log('matchedCards length:', matchedCards.length);
     if (matchedCards.length === cardImages.length * 2) {
-      setIsGameCompleted(true);
+      setShowModal(true);
     }
-  }, [cardImages.length, matchedCards]);
+  }, [matchedCards, cardImages.length]);
 
   const handleCardClick = (id) => {
-    const flippedCard = cards.find(card => card.id === id);
-    if (flippedCard.isFlipped || flippedCards.length === 2) return;
+    if (flippedCards.length === 2 || flippedCards.includes(id) || matchedCards.includes(id)) return;
 
-    const newFlippedCards = [...flippedCards, id];
-    const newCards = cards.map(card =>
-      card.id === id ? { ...card, isFlipped: true } : card
-    );
-
-    setCards(newCards);
-    setFlippedCards(newFlippedCards);
-
-    if (newFlippedCards.length === 2) {
-      const [firstId, secondId] = newFlippedCards;
-      const firstCard = newCards.find(card => card.id === firstId);
-      const secondCard = newCards.find(card => card.id === secondId);
-
-      if (firstCard.image === secondCard.image) {
-        setMatchedCards([...matchedCards, firstId, secondId]);
-        setFlippedCards([]);
-      } else {
-        setTimeout(() => {
-          setCards(newCards.map(card =>
-            card.id === firstId || card.id === secondId
-              ? { ...card, isFlipped: false }
-              : card
-          ));
-          setFlippedCards([]);
-        }, 1000);
+    setFlippedCards((prev) => {
+      const newFlippedCards = [...prev, id];
+      if (newFlippedCards.length === 2) {
+        const [firstIndex, secondIndex] = newFlippedCards;
+        if (cards[firstIndex] === cards[secondIndex]) {
+          setMatchedCards((prev) => {
+            if (!prev.includes(firstIndex) && !prev.includes(secondIndex)) {
+              return [...prev, firstIndex, secondIndex];
+            }
+            return prev;
+          });
+        }
+        setTimeout(() => setFlippedCards([]), 1000);
       }
-    }
+      return newFlippedCards;
+    });
   };
 
+
   const handleRestart = () => {
-    setIsGameCompleted(false);
-    setMatchedCards([]);
-    setFlippedCards([]);
-    const shuffledCards = [...cardImages, ...cardImages]
-      .sort(() => Math.random() - 0.5)
-      .map((image, index) => ({ id: index, image, isFlipped: false }));
+    const shuffledCards = [...cardImages, ...cardImages].sort(() => Math.random() - 0.5);
     setCards(shuffledCards);
+    setFlippedCards([]);
+    setMatchedCards([]);
+    setShowModal(false);
   };
 
   return (
     <div className="memory-game">
-      {cards.map((card) => (
+      {cards.map((image, index) => (
         <Card
-          key={card.id}
-          id={card.id}
-          image={card.image}
+          key={index}
+          id={index}
+          image={image}
           onClick={handleCardClick}
-          isFlipped={card.isFlipped || matchedCards.includes(card.id)}
+          isFlipped={flippedCards.includes(index) || matchedCards.includes(index)}
         />
       ))}
-      {isGameCompleted && <Modal onRestart={handleRestart} />}
+      {showModal && <Modal onRestart={handleRestart} />}
     </div>
   );
 };
