@@ -24,6 +24,8 @@ const MemoryGame = () => {
     }
   }, [matchedCards, cardImages.length]);
 
+  const [clickCount, setClickCount] = useState(0);
+
   const handleCardClick = (id) => {
     if (flippedCards.length === 2 || flippedCards.includes(id) || matchedCards.includes(id)) return;
 
@@ -43,6 +45,7 @@ const MemoryGame = () => {
       }
       return newFlippedCards;
     });
+    setClickCount(prevCount => prevCount + 1);
   };
 
 
@@ -52,9 +55,12 @@ const MemoryGame = () => {
     setFlippedCards([]);
     setMatchedCards([]);
     setShowModal(false);
+
+    setClickCount(0);
   };
 
   return (
+    <><div>Click Count: {clickCount}</div>
     <div className="memory-game">
       {cards.map((image, index) => (
         <Card
@@ -62,11 +68,10 @@ const MemoryGame = () => {
           id={index}
           image={image}
           onClick={handleCardClick}
-          isFlipped={flippedCards.includes(index) || matchedCards.includes(index)}
-        />
+          isFlipped={flippedCards.includes(index) || matchedCards.includes(index)} />
       ))}
       {showModal && <Modal onRestart={handleRestart} />}
-    </div>
+    </div></>
   );
 };
 
